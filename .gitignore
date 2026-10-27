@@ -10,6 +10,7 @@ keystore.properties
 
 # ---- 运行产物 ----
 relay/public/app/latest.json
+relay/.data/
 _artifacts/
 uploads/
 shots/

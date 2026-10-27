@@ -732,7 +732,7 @@ services:
 
 ### 相关文档
 
-- [`部署/服务器搭建手册.md`](./部署/服务器搭建手册.md) —— 采购清单、初始化脚本、冒烟测试、故障排查
+- [`deploy/SERVER-SETUP.md`](deploy/SERVER-SETUP.md) —— 采购清单、初始化脚本、冒烟测试、故障排查
 - [`部署/bootstrap.sh`](./部署/bootstrap.sh) —— 一键初始化（时区/swap/BBR/Docker/防火墙/备份）
 - [`部署/relay/server.mjs`](./部署/relay/server.mjs) —— 冒烟测试用 WS 服务（正式版会替换）
 

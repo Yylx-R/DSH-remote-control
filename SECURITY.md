@@ -27,7 +27,7 @@ DSH Remote 是一个**自建**的远程通道：手机 → 你自己的中继服
 
 仓库默认按 **HTTP** 演示。公网部署**必须**配 HTTPS：
 
-- 用域名 + Caddy/Nginx 申请 Let's Encrypt 证书（见 `deploy/服务器搭建手册.md`）；
+- 用域名 + Caddy/Nginx 申请 Let's Encrypt 证书（见 `deploy/SERVER-SETUP.md`）；
 - 或在无备案环境下用 Cloudflare Tunnel 只出站转发。
 
 明文 HTTP 下，登录密码和聊天内容会在公网上以明文传输。
