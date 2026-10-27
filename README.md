@@ -39,7 +39,7 @@ docs/         设计方案（架构、协议、数据模型、路线图）
 **你不需要自己的服务器**——这套东西是自托管的：谁想用，就部署到自己的机器上。一台 2 核 2G 的小机器足够（5~10 人、10~25 台设备），甚至树莓派/NAS 也行。
 
 ```bash
-git clone https://github.com/<you>/<repo>.git dsh-remote
+git clone https://github.com/Yylx-R/DSH-remote-control.git dsh-remote
 cd dsh-remote
 
 # 有域名（自动申请证书、开 HTTPS）
@@ -54,7 +54,7 @@ sudo bash deploy/install.sh
 也可以用预构建镜像，省掉本地构建：
 
 ```bash
-sudo bash deploy/install.sh --image ghcr.io/<you>/dsh-remote-relay:latest --domain relay.example.com --email you@example.com
+sudo bash deploy/install.sh --image ghcr.io/yylx-r/dsh-remote-relay:latest --domain relay.example.com --email you@example.com
 ```
 
 升级 = `docker compose pull && docker compose up -d`；数据全在 `deploy/data/`，备份 `bash deploy/backup.sh`。

@@ -10,7 +10,7 @@
 服务器到手、域名解析生效后，只需要：
 
 ```bash
-git clone https://github.com/<you>/<repo>.git /opt/dsh-remote
+git clone https://github.com/Yylx-R/DSH-remote-control.git /opt/dsh-remote
 cd /opt/dsh-remote
 sudo bash deploy/install.sh --domain relay.example.com --email you@example.com
 ```
