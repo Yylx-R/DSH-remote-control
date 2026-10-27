@@ -4,17 +4,37 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- 手机外框 -->
     <path
-        android:pathData="M38,38 L54,48 L38,58"
+        android:pathData="M44,23 H64 A11,11 0 0 1 75,34 V74 A11,11 0 0 1 64,85 H44 A11,11 0 0 1 33,74 V34 A11,11 0 0 1 44,23 Z"
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="7"
+        android:strokeWidth="5"
+        android:fillColor="#00000000" />
+
+    <!-- 提示符 > -->
+    <path
+        android:pathData="M45,47 L52,54 L45,61"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:fillColor="#00000000" />
+
+    <!-- 光标 _ -->
     <path
-        android:pathData="M60,60 L74,60"
+        android:pathData="M57,61 L67,61"
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="7"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- 底部指示条 -->
+    <path
+        android:pathData="M49,74 L59,74"
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.7"
+        android:strokeWidth="3"
         android:strokeLineCap="round"
         android:fillColor="#00000000" />
 </vector>
