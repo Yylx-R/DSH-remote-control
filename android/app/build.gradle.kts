@@ -1,4 +1,4 @@
-import java.io.FileInputStream
+﻿import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -16,8 +16,8 @@ android {
         applicationId = "com.dshremote.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 8
-        versionName = "0.8"
+        versionCode = 9
+        versionName = "0.8.1"
     }
 
     signingConfigs {
@@ -91,3 +91,4 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
+

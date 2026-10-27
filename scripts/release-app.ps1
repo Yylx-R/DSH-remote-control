@@ -1,4 +1,4 @@
-# 一键发布手机 App
+﻿# 一键发布手机 App
 #   1) 读 app/build.gradle.kts 里的 versionName / versionCode
 #   2) 编译 debug APK
 #   3) 生成 public/app/latest.json（App 内「检查更新」读这个文件）
@@ -67,7 +67,7 @@ New-Item -ItemType Directory -Force $manifestDir | Out-Null
 # ---- 4. 上传 ----
 scp -o StrictHostKeyChecking=no -i $SshKey $apk "root@${Server}:/opt/dsh-remote/relay/public/" | Out-Null
 scp -o StrictHostKeyChecking=no -i $SshKey "$manifestDir\latest.json" "root@${Server}:/opt/dsh-remote/relay/public/app/" | Out-Null
-ssh -o StrictHostKeyChecking=no -i $SshKey "root@$Server" "docker cp /opt/dsh-remote/relay/public/$apkName dsh-remote-relay-1:/app/public/ ; docker cp /opt/dsh-remote/relay/public/app/latest.json dsh-remote-relay-1:/app/public/app/latest.json ; echo PUBLISHED"
+ssh -o StrictHostKeyChecking=no -i $SshKey "root@$Server" "docker cp /opt/dsh-remote/relay/public/$apkName dsh-remote-relay-1:/app/public/ ; docker exec dsh-remote-relay-1 mkdir -p /app/public/app ; docker cp /opt/dsh-remote/relay/public/app/latest.json dsh-remote-relay-1:/app/public/app/latest.json ; echo PUBLISHED"
 
 Write-Host "完成：http://$Server/$apkName"
 Write-Host "手机上打开 App → 设置 → 应用更新 → 检查更新，即可安装。"
