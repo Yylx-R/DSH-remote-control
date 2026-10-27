@@ -43,6 +43,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const listeners = new Set()
 const captured = []
 
+const TITLES = (process.env.SIM_TITLES || '联调会话：测试手机端,另一个会话').split(',').map(s => s.trim())
+const GREETING = process.env.SIM_GREETING || '我是模拟电脑，收到指令会立刻回显。'
 const sessions = [
   {
     sessionId: 'sim-1',
@@ -51,7 +53,7 @@ const sessions = [
     updatedAt: Date.now() - 60_000,
     cwd: process.cwd(),
     agentAvailable: true,
-    projections: { values: { title: '联调会话：测试手机端' } },
+    projections: { values: { title: TITLES[0] } },
   },
   {
     sessionId: 'sim-2',
@@ -60,7 +62,7 @@ const sessions = [
     updatedAt: Date.now() - 3_600_000,
     cwd: process.cwd(),
     agentAvailable: true,
-    projections: { values: { title: '另一个会话' } },
+    projections: { values: { title: TITLES[1] || '另一个会话' } },
   },
 ]
 
@@ -92,11 +94,11 @@ const fakeController = {
   async page() {
     return {
       records: [
-        { type: 'user/message', seq: 1, data: { message: { content: [{ type: 'text', text: '这是历史消息' }] } } },
+        { type: 'user/message', seq: 1, data: { message: { content: [{ type: 'text', text: '帮我把这周的截图整理一下，按日期建文件夹' }] } } },
         {
           type: 'assistant/message',
           seq: 2,
-          data: { message: { content: [{ type: 'text', text: '我是模拟电脑，收到指令会立刻回显。' }] } },
+          data: { message: { content: [{ type: 'text', text: '好的，已按日期归到 screenshots/ 下：10-21 三张、10-22 五张，重复的已跳过。' }] } },
         },
       ],
       hasMore: false,
@@ -108,11 +110,11 @@ const fakeController = {
         type: 'snapshot',
         cursor: 0,
         records: [
-          { type: 'user/message', seq: 1, data: { message: { content: [{ type: 'text', text: '这是历史消息' }] } } },
+          { type: 'user/message', seq: 1, data: { message: { content: [{ type: 'text', text: '帮我把这周的截图整理一下，按日期建文件夹' }] } } },
           {
             type: 'assistant/message',
             seq: 2,
-            data: { message: { content: [{ type: 'text', text: '我是模拟电脑，收到指令会立刻回显。' }] } },
+            data: { message: { content: [{ type: 'text', text: '好的，已按日期归到 screenshots/ 下：10-21 三张、10-22 五张，重复的已跳过。' }] } },
           },
         ],
         hasMore: false,
