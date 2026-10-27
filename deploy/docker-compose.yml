@@ -1,12 +1,25 @@
-name: dsh-remote
+name: ${COMPOSE_PROJECT_NAME:-dsh-remote}
+
+# 两种用法：
+#   源码部署：docker compose up -d --build
+#   镜像部署：在 .env 里设 RELAY_IMAGE=ghcr.io/<owner>/dsh-remote-relay:latest
+#            docker compose pull && docker compose up -d
+#
+# 有域名（自动 HTTPS）：docker compose --profile tls up -d --build
+# 没域名（HTTP 直连）：  docker compose -f docker-compose.yml -f docker-compose.direct.yml up -d --build
 
 services:
   relay:
-    build: ./relay
+    image: ${RELAY_IMAGE:-dsh-remote-relay:local}
+    build:
+      context: ../relay
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
       PORT: "8787"
-      PUBLIC_URL: "https://${DOMAIN}"
+      DATA_DIR: "/data"
+      BLOB_MAX_MB: "${BLOB_MAX_MB:-50}"
+      PUBLIC_URL: "${PUBLIC_URL:-}"
       NODE_ENV: production
     expose:
       - "8787"
@@ -29,8 +42,8 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN: "${DOMAIN}"
-      ACME_EMAIL: "${ACME_EMAIL}"
+      DOMAIN: "${DOMAIN:-}"
+      ACME_EMAIL: "${ACME_EMAIL:-}"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./data/caddy:/data

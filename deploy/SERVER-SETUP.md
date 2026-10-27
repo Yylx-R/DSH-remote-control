@@ -5,7 +5,24 @@
 
 ---
 
-## 0. 现在的状态
+## 最快路径：一键部署（推荐先试这个）
+
+服务器到手、域名解析生效后，只需要：
+
+```bash
+git clone https://github.com/<you>/<repo>.git /opt/dsh-remote
+cd /opt/dsh-remote
+sudo bash deploy/install.sh --domain relay.example.com --email you@example.com
+```
+
+没有域名就先 `sudo bash deploy/install.sh`（HTTP 直连 80 端口，仅建议试用）。
+
+脚本会自动装 Docker、写 `.env`、构建并启动 relay（有域名则连 Caddy 一起起、自动签证书）、做健康检查、打印访问地址。
+下面的章节是**从零手工搭建**的完整记录，想自己控制每一步、或需要 swap/BBR/防火墙/fail2ban 时再照着做。
+
+---
+
+## 0. 当时的起点（历史记录）
 
 | 项 | 状态 |
 |---|---|

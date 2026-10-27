@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  relay:
+    name: relay 冒烟测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: 安装依赖
+        working-directory: relay
+        run: npm ci || npm install
+
+      - name: 启动 relay
+        working-directory: relay
+        run: |
+          DATA_DIR=./.ci-data PORT=8787 BLOB_MAX_MB=5 node src/index.mjs > /tmp/relay.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8787/healthz && break
+            sleep 1
+          done
+
+      - name: 跑冒烟
+        working-directory: relay
+        run: node test/smoke.mjs
+
+      - name: 失败时输出服务日志
+        if: failure()
+        run: cat /tmp/relay.log
+
+  android:
+    name: Android 构建
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: assembleDebug
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --console=plain assembleDebug
+
+      - name: 上传 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

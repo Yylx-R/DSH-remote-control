@@ -34,17 +34,31 @@ docs/         设计方案（架构、协议、数据模型、路线图）
 
 ## 快速开始
 
-### 1. 中继服务器
+### 1. 中继服务器（一键部署）
 
-一台 2 核 2G 的小机器就够（5~10 人、10~25 台设备）。
+**你不需要自己的服务器**——这套东西是自托管的：谁想用，就部署到自己的机器上。一台 2 核 2G 的小机器足够（5~10 人、10~25 台设备），甚至树莓派/NAS 也行。
 
 ```bash
-# Ubuntu 22.04 / 24.04
-sudo DOMAIN=your.domain ACME_EMAIL=you@example.com bash deploy/bootstrap.sh
-cd /opt/dsh-remote && docker compose up -d --build
+git clone https://github.com/<you>/<repo>.git dsh-remote
+cd dsh-remote
+
+# 有域名（自动申请证书、开 HTTPS）
+sudo bash deploy/install.sh --domain relay.example.com --email you@example.com
+
+# 没域名（HTTP 直连 80 端口，仅建议内网/试用）
+sudo bash deploy/install.sh
 ```
 
-没有域名也可以先跑 HTTP（`deploy/docker-compose.direct.yml`），但**公网务必配 HTTPS**。
+脚本会自动：装 Docker → 写 `.env` → 构建并启动 relay（+ Caddy 自动 HTTPS）→ 健康检查 → 打印访问地址。
+
+也可以用预构建镜像，省掉本地构建：
+
+```bash
+sudo bash deploy/install.sh --image ghcr.io/<you>/dsh-remote-relay:latest --domain relay.example.com --email you@example.com
+```
+
+升级 = `docker compose pull && docker compose up -d`；数据全在 `deploy/data/`，备份 `bash deploy/backup.sh`。
+从零装系统（含 swap、BBR、防火墙、fail2ban）见 [`deploy/SERVER-SETUP.md`](deploy/SERVER-SETUP.md)。
 
 ### 2. 电脑端插件
 
