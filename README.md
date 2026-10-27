@@ -1,5 +1,11 @@
 # DSH Remote · 手机远程操作你的 DSH
 
+[![CI](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/ci.yml/badge.svg)](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/ci.yml)
+[![Docker](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/docker.yml/badge.svg)](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/docker.yml)
+[![Release](https://img.shields.io/github/v/release/Yylx-R/DSH-remote-control)](https://github.com/Yylx-R/DSH-remote-control/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Android](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](android/)
+
 把 [DeepSeek Harness](https://github.com/deepseek-ai) 的会话搬到手机上：手机发文字/图片/文件 →
 **你自己的**中继服务器 → **你自己的**电脑执行 → 结果实时回到手机。
 
@@ -50,6 +56,13 @@ sudo bash deploy/install.sh
 ```
 
 脚本会自动：装 Docker → 写 `.env` → 构建并启动 relay（+ Caddy 自动 HTTPS）→ 健康检查 → 打印访问地址。
+
+想卸载时（默认保留数据）：
+
+```bash
+sudo bash deploy/uninstall.sh           # 删容器和网络，data/ 保留
+sudo bash deploy/uninstall.sh --purge   # 连数据库、上传文件、证书一起删
+```
 
 也可以用预构建镜像，省掉本地构建：
 
