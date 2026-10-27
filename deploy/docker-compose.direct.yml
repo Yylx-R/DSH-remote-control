@@ -1,0 +1,8 @@
+# 临时直连模式（没有域名/证书时使用）
+# 用法：docker compose -f docker-compose.yml -f docker-compose.direct.yml up -d relay
+# 把 relay 直接发布到宿主机 80 端口，手机/电脑用 http://<服务器IP>/ 访问。
+# 配好域名和 Caddy 之后删掉本文件即可（或改用正式 compose）。
+services:
+  relay:
+    ports:
+      - "80:8787"

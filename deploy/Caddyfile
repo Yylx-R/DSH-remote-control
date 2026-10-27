@@ -1,0 +1,26 @@
+{
+  email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# WebSocket / API 全部反代给 relay
+	reverse_proxy relay:8787
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10mb
+			roll_keep 5
+			roll_keep_for 720h
+		}
+		format json
+	}
+}

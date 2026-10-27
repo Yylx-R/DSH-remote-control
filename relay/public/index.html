@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+    <meta name="theme-color" content="#0f1115" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>远程 DSH</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" />
+    <link rel="stylesheet" href="/style.css?v=20261027r" />
+  </head>
+  <body>
+    <header id="topbar">
+      <button id="back" class="icon-btn" hidden aria-label="返回"><span class="ic" data-icon="chevron-left"></span></button>
+      <div id="title-wrap">
+        <h1 id="title">远程 DSH</h1>
+        <span id="subtitle"></span>
+      </div>
+      <button id="screen-btn" class="icon-btn" hidden aria-label="看电脑屏幕"><span class="ic" data-icon="monitor"></span></button>
+      <button id="menu" class="icon-btn" aria-label="设置"><span class="ic" data-icon="gear"></span></button>
+      <span id="conn" class="dot off" title="连接状态"></span>
+    </header>
+
+    <main id="main">
+      <!-- 登录 -->
+      <section id="screen-login" class="screen">
+        <div class="card">
+          <h2>登录中继服务器</h2>
+          <p class="muted" id="login-server"></p>
+          <label>账号<input id="login-handle" autocomplete="username" placeholder="用户名" /></label>
+          <label>密码<input id="login-password" type="password" autocomplete="current-password" placeholder="密码" /></label>
+          <label>设备名<input id="login-device" placeholder="例如 我的手机" /></label>
+          <button id="login-btn" class="primary">登录</button>
+          <p class="err" id="login-err"></p>
+        </div>
+      </section>
+
+      <!-- 设备列表 -->
+      <section id="screen-devices" class="screen" hidden>
+        <div class="card">
+          <h2>选择要控制的电脑</h2>
+          <div id="device-list" class="list"></div>
+          <button id="pair-open" class="ghost"><span class="ic" data-icon="link"></span>配对新的电脑</button>
+        </div>
+      </section>
+
+      <!-- 配对 -->
+      <section id="screen-pair" class="screen" hidden>
+        <div class="card">
+          <h2>输入配对码</h2>
+          <p class="muted">在电脑上运行配对脚本，把显示的 8 位配对码填到这里。</p>
+          <input id="pair-code" class="code" maxlength="8" autocapitalize="characters" placeholder="ABCD1234" />
+          <button id="pair-claim" class="primary">配对</button>
+          <p class="muted" id="pair-status"></p>
+        </div>
+      </section>
+
+      <!-- 会话列表 -->
+      <section id="screen-sessions" class="screen" hidden>
+        <div class="toolbar">
+          <button id="new-session" class="ghost small"><span class="ic" data-icon="plus" data-icon-size="16"></span>新会话</button>
+          <button id="refresh-sessions" class="ghost small"><span class="ic" data-icon="refresh" data-icon-size="16"></span>刷新</button>
+        </div>
+        <div id="session-list" class="list"></div>
+      </section>
+
+      <!-- 聊天 -->
+      <section id="screen-chat" class="screen chat" hidden>
+        <div id="messages" class="messages"></div>
+        <div id="attachment-bar" class="attachment-bar" hidden></div>
+        <div id="composer" class="composer">
+          <button id="attach" class="round ghost round-plus" aria-label="添加图片或文件"><span class="ic" data-icon="plus" data-icon-size="22"></span></button>
+          <textarea id="input" rows="1" placeholder="给电脑发指令…"></textarea>
+          <button id="send" class="primary round" aria-label="发送"><span class="ic" data-icon="arrow-up"></span></button>
+          <button id="stop" class="danger round" aria-label="停止" hidden><span class="ic" data-icon="stop"></span></button>
+        </div>
+        <input id="file-input" type="file" multiple hidden />
+        <input id="image-input" type="file" accept="image/*" multiple hidden />
+        <input id="camera-input" type="file" accept="image/*" capture="environment" hidden />
+        <div id="attach-sheet" class="sheet" hidden>
+          <div class="sheet-mask"></div>
+          <div class="sheet-body">
+            <button class="sheet-item" data-pick="image"><span class="ic" data-icon="image" data-icon-size="22"></span><span class="sheet-label">从相册选择图片</span></button>
+            <button class="sheet-item" data-pick="camera"><span class="ic" data-icon="camera" data-icon-size="22"></span><span class="sheet-label">拍照</span></button>
+            <button class="sheet-item" data-pick="file"><span class="ic" data-icon="file" data-icon-size="22"></span><span class="sheet-label">选择文件</span></button>
+            <button class="sheet-item cancel" data-pick="cancel">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 电脑屏幕 -->
+      <section id="screen-view" class="screen view" hidden>
+        <div class="toolbar view-toolbar">
+          <button id="view-refresh" class="ghost small"><span class="ic" data-icon="refresh" data-icon-size="16"></span><span class="lbl">刷新</span></button>
+          <button id="view-auto" class="ghost small" aria-pressed="false"><span class="ic" data-icon="dot" data-icon-size="16"></span><span class="lbl">自动</span></button>
+          <div class="seg" id="view-orient" role="group" aria-label="画面方向">
+            <button type="button" data-orient="land" class="on">横屏</button>
+            <button type="button" data-orient="port">竖屏</button>
+          </div>
+          <select id="view-screens" class="mini-select" aria-label="屏幕">
+            <option value="primary" selected>主屏</option>
+            <option value="secondary">副屏</option>
+            <option value="all">全部</option>
+          </select>
+          <select id="view-quality" class="mini-select" aria-label="画质">
+            <option value="1280">流畅</option>
+            <option value="1920">标准</option>
+            <option value="2560" selected>清晰</option>
+            <option value="3840">原画</option>
+          </select>
+          <button id="view-full" class="ghost small" aria-label="全屏查看"><span class="ic" data-icon="monitor" data-icon-size="16"></span></button>
+        </div>
+        <button id="view-exit" class="view-exit" aria-label="退出全屏"><span class="ic" data-icon="x" data-icon-size="20"></span></button>
+        <div class="toolbar view-controls" id="view-controls" role="group" aria-label="远程控制">
+          <button class="ghost small" data-act="alt_tab">切换窗口</button>
+          <button class="ghost small" data-act="alt_tab_back">反向切换</button>
+          <button class="ghost small" data-act="win">开始菜单</button>
+          <button class="ghost small" data-act="win_d">显示桌面</button>
+          <button class="ghost small" data-act="esc">Esc</button>
+          <button class="ghost small" data-act="enter">回车</button>
+          <button class="ghost small" data-act="alt_f4">关闭窗口</button>
+        </div>
+        <div id="view-stage" class="view-stage">
+          <canvas id="view-shot" class="view-shot" hidden></canvas>
+          <div id="view-empty" class="empty">点「刷新」抓取一帧</div>
+        </div>
+        <div class="view-foot"><span id="view-meta"></span></div>
+      </section>
+
+      <!-- 设置 -->
+      <section id="screen-settings" class="screen" hidden>
+        <div class="card">
+          <h2>设置</h2>
+          <div class="kv"><span>服务器</span><b id="set-server"></b></div>
+          <div class="kv"><span>账号</span><b id="set-handle"></b></div>
+          <div class="kv"><span>本机设备</span><b id="set-device"></b></div>
+          <h3>已登录设备</h3>
+          <div id="set-devices" class="list"></div>
+          <h3>手机 App</h3>
+          <a class="btn-download" href="/dsh-remote-app-0.7.apk" download="dsh-remote-app-0.7.apk">
+            <span class="ic" data-icon="monitor" data-icon-size="16"></span>
+            <span class="dl-label">下载 Android 安装包 0.7（17 MB）</span>
+          </a>
+          <p class="hint">在手机上点开这个链接即可下载安装；装好后用同一个账号登录、再配对电脑。</p>
+          <button id="logout" class="ghost danger-text">退出登录</button>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" hidden></div>
+    <script src="/app.js?v=20261027x" type="module"></script>
+  </body>
+</html>

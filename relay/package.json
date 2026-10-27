@@ -1,0 +1,17 @@
+{
+  "name": "dsh-relay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DSH 远程控制中继：设备配对、消息转发、文件暂存",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "test:smoke": "node test/smoke.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

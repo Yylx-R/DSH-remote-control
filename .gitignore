@@ -1,0 +1,41 @@
+# ---- 本地凭据：绝对不要提交 ----
+.secrets.local.json
+.secrets.local.md
+*.local.json
+*.local.md
+keystore.properties
+*.jks
+*.keystore
+.phone-token
+
+# ---- 运行产物 ----
+relay/public/app/latest.json
+_artifacts/
+uploads/
+shots/
+releases/
+dist/
+*.apk
+*.aab
+*.log
+tmp-*.txt
+tmp-*.html
+*.bak
+
+# ---- 依赖与构建 ----
+node_modules/
+.gradle/
+.kotlin/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ---- 系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
