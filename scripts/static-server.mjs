@@ -2,7 +2,7 @@ import http from 'node:http'
 import { readFile } from 'node:fs/promises'
 import { join, extname } from 'node:path'
 
-const ROOT = 'E:/插件设计'
+const ROOT = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' }
 
 http.createServer(async (req, res) => {

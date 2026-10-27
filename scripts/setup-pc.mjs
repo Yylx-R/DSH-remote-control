@@ -34,7 +34,7 @@ if (!serverUrl || !handle || !password) {
   process.exit(1)
 }
 
-const { loadConfig, saveConfig } = await import('file:///E:/插件设计/dsh-plugin/lib/config.js')
+const { loadConfig, saveConfig } = await import(new URL('../dsh-plugin/lib/config.js', import.meta.url).href)
 const cfg = loadConfig({})
 cfg.serverUrl = serverUrl.trim().replace(/\/+$/, '')
 cfg.handle = handle.trim()

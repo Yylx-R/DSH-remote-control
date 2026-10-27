@@ -6,8 +6,9 @@ import { join } from 'node:path'
 
 process.env.DSH_PROFILE_DIR = mkdtempSync(join(tmpdir(), 'setup-'))
 
-const { loadConfig, saveConfig } = await import('file:///E:/插件设计/dsh-plugin/lib/config.js')
-const { registerSetup } = await import('file:///E:/插件设计/dsh-plugin/lib/setup.js')
+const lib = (f) => new URL(`../dsh-plugin/lib/${f}`, import.meta.url).href
+const { loadConfig, saveConfig } = await import(lib('config.js'))
+const { registerSetup } = await import(lib('setup.js'))
 
 const cfg = loadConfig({})
 cfg.refresh = () => {}

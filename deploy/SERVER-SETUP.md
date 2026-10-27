@@ -105,13 +105,13 @@ nslookup relay.example.com
 ### 3.1 本地打包
 
 ```powershell
-Compress-Archive -Path "E:\插件设计\部署\*" -DestinationPath "E:\插件设计\deploy.zip" -Force
+Compress-Archive -Path ".\deploy\*" -DestinationPath ".\deploy.zip" -Force
 ```
 
 ### 3.2 上传（Windows 10/11 自带 scp）
 
 ```powershell
-scp "E:\插件设计\deploy.zip" root@<服务器IP>:/root/
+scp ".\deploy.zip" root@<服务器IP>:/root/
 ```
 
 > 没有 scp？用阿里云控制台的「Workbench」网页终端，或用 WinSCP 拖上去。

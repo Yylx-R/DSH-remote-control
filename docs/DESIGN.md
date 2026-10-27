@@ -438,7 +438,7 @@ ctx.effect(() => {
   config:
     relayUrl: wss://relay.example.com/ws
     deviceName: 我的台式机
-    inboxDir: E:\插件设计\inbox        # 自定义，默认 %USERPROFILE%\DSH-Inbox
+    inboxDir: D:\DSH-Inbox              # 自定义，默认 %USERPROFILE%\DSH-Inbox
     maxFileMB: 50
     allowWorkspaceWrite: false
     autoConnect: true

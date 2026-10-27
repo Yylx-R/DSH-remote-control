@@ -1,9 +1,10 @@
-﻿import { writeFileSync, mkdtempSync } from "node:fs"
+import { writeFileSync, mkdtempSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 process.env.DSH_PROFILE_DIR = mkdtempSync(join(tmpdir(), "setup-"))
-const { loadConfig } = await import("file:///E:/插件设计/dsh-plugin/lib/config.js")
-const { registerSetup } = await import("file:///E:/插件设计/dsh-plugin/lib/setup.js")
+const lib = (f) => new URL(`../dsh-plugin/lib/${f}`, import.meta.url).href
+const { loadConfig } = await import(lib("config.js"))
+const { registerSetup } = await import(lib("setup.js"))
 const routes = []
 const web = { register: (r) => routes.push(r) }
 const cfg = loadConfig({})
@@ -16,6 +17,6 @@ const server = http.createServer(async (req, res) => {
 })
 await new Promise(r => server.listen(0, "127.0.0.1", r))
 const page = await (await fetch(`http://127.0.0.1:${server.address().port}/remote-control`)).text()
-writeFileSync("E:/插件设计/tmp-setup-page.html", page)
+writeFileSync(join(tmpdir(), "dsh-remote-setup-page.html"), page)
 server.close()
 console.log("ok", page.length)

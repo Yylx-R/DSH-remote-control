@@ -49,7 +49,7 @@ const sessions = [
     running: false,
     blank: false,
     updatedAt: Date.now() - 60_000,
-    cwd: 'E:\\插件设计',
+    cwd: process.cwd(),
     agentAvailable: true,
     projections: { values: { title: '联调会话：测试手机端' } },
   },
@@ -58,7 +58,7 @@ const sessions = [
     running: false,
     blank: true,
     updatedAt: Date.now() - 3_600_000,
-    cwd: 'E:\\插件设计',
+    cwd: process.cwd(),
     agentAvailable: true,
     projections: { values: { title: '另一个会话' } },
   },
@@ -74,7 +74,7 @@ const fakeController = {
       running: false,
       blank: true,
       updatedAt: Date.now(),
-      cwd: 'E:\\插件设计',
+      cwd: process.cwd(),
       agentAvailable: true,
       projections: { values: { title: '新会话' } },
     }
@@ -149,7 +149,7 @@ const fakeController = {
 
 const hostCtx = {
   sessionController: fakeController,
-  workspaceRegistry: { list: async () => [{ id: 'w1', path: 'E:\\插件设计', title: '插件设计' }] },
+  workspaceRegistry: { list: async () => [{ id: 'w1', path: process.cwd(), title: '工作区' }] },
 }
 const ctx = {
   inject(_s, cb) {

@@ -11,7 +11,11 @@ import { execFileSync } from 'node:child_process'
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 
-const ADB = 'C:\\Users\\Administrator\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe'
+const ADB =
+  process.env.ADB ||
+  (process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT
+    ? `${process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT}${process.platform === 'win32' ? '\\' : '/'}platform-tools${process.platform === 'win32' ? '\\' : '/'}adb${process.platform === 'win32' ? '.exe' : ''}`
+    : 'adb')
 const KEYMAP = { back: 4, home: 3, enter: 66, escape: 111, tab: 61, delete: 67 }
 
 function sh(...args) {

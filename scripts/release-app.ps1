@@ -1,11 +1,11 @@
-﻿# 一键发布手机 App
+# 一键发布手机 App
 #   1) 读 app/build.gradle.kts 里的 versionName / versionCode
 #   2) 编译 debug APK
 #   3) 生成 public/app/latest.json（App 内「检查更新」读这个文件）
 #   4) 上传 APK + latest.json 到中转服务器并放进 relay 容器
 #
 # 用法：
-#   pwsh -File E:\插件设计\scripts\release-app.ps1 -Notes "本次更新说明"
+#   pwsh -File .\scripts\release-app.ps1 -Notes "本次更新说明"
 # 版本号请先在 app/build.gradle.kts 里手动改大（versionCode 必须递增）。
 
 param(
@@ -24,7 +24,7 @@ if (-not $Server -or -not $SshKey) {
     }
 }
 if (-not $Server -or -not $SshKey) { throw '缺少服务器地址或 SSH 私钥：请在 .secrets.local.json 里配置 server / sshKey，或用 -Server / -SshKey 传入。' }
-$root = "E:\插件设计"
+$root = Split-Path $PSScriptRoot -Parent
 $proj = Join-Path (Split-Path $PSScriptRoot -Parent) "android"
 
 # ---- 1. 版本号 ----

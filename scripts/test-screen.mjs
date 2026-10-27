@@ -3,12 +3,14 @@ const S = secrets()
 
 // 验证「手机看电脑画面」：以手机身份连 relay，向在线电脑发 screen.capture，下载并保存截图。
 import { readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 const BASE = process.env.PHONE_SERVER || S.server
 const HANDLE = process.env.PHONE_HANDLE || S.handle
 const PASSWORD = process.env.PHONE_PASSWORD || S.password
 const TOKEN_FILE = new URL('./.phone-token', import.meta.url)
-const OUT = process.env.SCREEN_OUT || 'E:/插件设计/uploads/_screen_from_phone.jpg'
+const OUT = process.env.SCREEN_OUT || join(tmpdir(), 'dsh-remote-screen.jpg')
 
 async function login() {
   const res = await fetch(BASE + '/api/login', {

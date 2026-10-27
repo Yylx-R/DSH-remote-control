@@ -1,7 +1,11 @@
 // 自动配对（不重新登录，直接复用插件已有的设备令牌，避免把插件顶掉）
 import { readFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 
-const CONFIG = 'C:\\Users\\Administrator\\.dsh\\profiles\\desktop\\remote-control.json'
+const CONFIG =
+  process.env.DSH_REMOTE_CONFIG ||
+  join(process.env.DSH_PROFILE_DIR || join(homedir(), '.dsh', 'profiles', 'desktop'), 'remote-control.json')
 const cfg = JSON.parse(readFileSync(CONFIG, 'utf8').replace(/^\uFEFF/, ''))
 const base = cfg.serverUrl.replace(/\/+$/, '')
 const headers = { authorization: `Bearer ${cfg.token}`, 'content-type': 'application/json' }
