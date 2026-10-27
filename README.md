@@ -64,7 +64,7 @@ sudo bash deploy/uninstall.sh           # 删容器和网络，data/ 保留
 sudo bash deploy/uninstall.sh --purge   # 连数据库、上传文件、证书一起删
 ```
 
-也可以用预构建镜像，省掉本地构建：
+也可以用预构建镜像，省掉本地构建（镜像默认私有，需先 `docker login ghcr.io`；不登录就用默认的本地构建）：
 
 ```bash
 sudo bash deploy/install.sh --image ghcr.io/yylx-r/dsh-remote-relay:latest --domain relay.example.com --email you@example.com
