@@ -27,3 +27,7 @@ gradlew   text eol=lf
 *.cjs    text eol=lf
 Dockerfile text eol=lf
 Caddyfile  text eol=lf
+
+# .env 必须 LF，否则值里会混进 \r
+.env       text eol=lf
+.env.*     text eol=lf
