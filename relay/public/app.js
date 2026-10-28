@@ -1,4 +1,4 @@
-// 远程 DSH 手机端（PWA）
+// DSH Console 手机端（PWA）
 import { icon, mountIcons } from './icons.js'
 const $ = (sel) => document.querySelector(sel)
 
@@ -692,7 +692,7 @@ async function doLogin() {
     localStorage.setItem(LS.device, JSON.stringify(state.device))
     connectWS()
     await loadMe()
-    show('devices', { title: '远程 DSH', subtitle: state.handle })
+    show('devices', { title: 'DSH Console', subtitle: state.handle })
     renderDevices()
   } catch (err) {
     errBox.textContent = err.message
@@ -712,7 +712,7 @@ function logout() {
   } catch {}
   state.ws = null
   setConn(false)
-  show('login', { title: '远程 DSH' })
+  show('login', { title: 'DSH Console' })
 }
 
 async function claimPair() {
@@ -734,7 +734,7 @@ async function claimPair() {
           status.textContent = '配对成功'
           await loadMe()
           toast('配对成功')
-          show('devices', { title: '远程 DSH', subtitle: state.handle })
+          show('devices', { title: 'DSH Console', subtitle: state.handle })
           renderDevices()
         } else if (st.state === 'cancelled' || st.state === 'expired') {
           clearInterval(state.pollTimer)
@@ -1092,10 +1092,10 @@ function bind() {
       if (state.viewFrom === 'chat' && state.current) openSession(state.current)
       else openSessions()
     } else if (state.screen === 'sessions') {
-      show('devices', { title: '远程 DSH', subtitle: state.handle })
+      show('devices', { title: 'DSH Console', subtitle: state.handle })
       renderDevices()
     } else if (state.screen === 'pair' || state.screen === 'settings') {
-      show('devices', { title: '远程 DSH', subtitle: state.handle })
+      show('devices', { title: 'DSH Console', subtitle: state.handle })
       renderDevices()
     }
   }
@@ -1121,10 +1121,10 @@ async function boot() {
   $('#login-server').textContent = state.base
   $('#login-device').value = localStorage.getItem('dsh.deviceName') || '我的手机'
   if (!state.token) {
-    show('login', { title: '远程 DSH' })
+    show('login', { title: 'DSH Console' })
     return
   }
-  show('devices', { title: '远程 DSH', subtitle: state.handle })
+  show('devices', { title: 'DSH Console', subtitle: state.handle })
   connectWS()
   try {
     await loadMe()

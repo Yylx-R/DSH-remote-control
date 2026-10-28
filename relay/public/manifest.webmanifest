@@ -1,6 +1,6 @@
 {
-  "name": "远程 DSH",
-  "short_name": "远程DSH",
+  "name": "DSH Console",
+  "short_name": "DSH Console",
   "description": "通过自建中继服务器，用手机远程操作电脑上的 DSH",
   "start_url": "/",
   "scope": "/",
