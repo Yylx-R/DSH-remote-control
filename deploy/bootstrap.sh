@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ============================================================
-# DSH 远程控制 · 服务器初始化脚本
+# DSH Console · 服务器初始化脚本
 # 适用：Ubuntu 22.04 / 24.04（阿里云轻量 香港）
 # 用法：DOMAIN=relay.example.com ACME_EMAIL=you@example.com bash bootstrap.sh
 # 幂等：可重复执行，已完成的步骤会跳过
 # ============================================================
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-/opt/dsh-remote}"
+APP_DIR="${APP_DIR:-/opt/dsh-console}"
 SWAP_MB="${SWAP_MB:-2048}"
 DOMAIN="${DOMAIN:-}"
 ACME_EMAIL="${ACME_EMAIL:-}"

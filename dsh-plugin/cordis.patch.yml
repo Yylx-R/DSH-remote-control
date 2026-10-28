@@ -1,5 +1,5 @@
-# dsh-remote-control bundle patch
+# dsh-console bundle patch
 # 安装本包后，DSH 加载器会把下面这一行加入宿主组合。
 - insert:
-    - id: remote-control
-      name: dsh-remote-control
+    - id: dsh-console
+      name: "@yylx-r/dsh-console"

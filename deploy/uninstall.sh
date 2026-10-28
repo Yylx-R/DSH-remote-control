@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 卸载 DSH Remote 中继：停止并删除容器与网络，默认保留数据。
+# 卸载 DSH Console 中继：停止并删除容器与网络，默认保留数据。
 #
 #   sudo bash deploy/uninstall.sh            # 删容器，保留 data/
 #   sudo bash deploy/uninstall.sh --purge    # 连 data/ 一起删（数据库、文件、证书）

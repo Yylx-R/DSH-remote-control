@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "DSH 远程控制中继：设备配对、消息转发、文件暂存",
+  "description": "DSH Console 中继：设备配对、消息转发、文件暂存",
   "engines": {
     "node": ">=24"
   },

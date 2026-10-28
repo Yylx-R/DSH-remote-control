@@ -17,6 +17,6 @@ const server = http.createServer(async (req, res) => {
 })
 await new Promise(r => server.listen(0, "127.0.0.1", r))
 const page = await (await fetch(`http://127.0.0.1:${server.address().port}/remote-control`)).text()
-writeFileSync(join(tmpdir(), "dsh-remote-setup-page.html"), page)
+writeFileSync(join(tmpdir(), "dsh-console-setup-page.html"), page)
 server.close()
 console.log("ok", page.length)

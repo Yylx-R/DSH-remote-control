@@ -10,8 +10,8 @@
 服务器到手、域名解析生效后，只需要：
 
 ```bash
-git clone https://github.com/Yylx-R/DSH-remote-control.git /opt/dsh-remote
-cd /opt/dsh-remote
+git clone https://github.com/Yylx-R/dsh-console.git /opt/dsh-console
+cd /opt/dsh-console
 sudo bash deploy/install.sh --domain relay.example.com --email you@example.com
 ```
 
@@ -124,9 +124,9 @@ ssh root@<服务器IP>
 
 ```bash
 apt-get update && apt-get install -y unzip
-mkdir -p /opt/dsh-remote
-unzip -o /root/deploy.zip -d /opt/dsh-remote
-cd /opt/dsh-remote
+mkdir -p /opt/dsh-console
+unzip -o /root/deploy.zip -d /opt/dsh-console
+cd /opt/dsh-console
 
 # Windows 上传的文件可能带 CRLF，先转掉，否则 bash 会报 "$'\r': command not found"
 sed -i 's/\r$//' bootstrap.sh backup.sh
@@ -142,7 +142,7 @@ ls -la
 ## 4. 跑初始化脚本
 
 ```bash
-cd /opt/dsh-remote
+cd /opt/dsh-console
 DOMAIN=relay.example.com ACME_EMAIL=你的邮箱@example.com bash bootstrap.sh
 ```
 
@@ -155,7 +155,7 @@ DOMAIN=relay.example.com ACME_EMAIL=你的邮箱@example.com bash bootstrap.sh
 | 3 | 建 2GB swap（2G 内存的保险） |
 | 4 | 开 BBR + 文件句柄调优 |
 | 5 | 装 Docker + Compose 插件，配日志轮转（防撑爆 40G 盘） |
-| 6 | 建目录 `/opt/dsh-remote/{relay,mobile,data,caddy,backups}` |
+| 6 | 建目录 `/opt/dsh-console/{relay,mobile,data,caddy,backups}` |
 | 7 | ufw 放行 22/80/443 并启用，fail2ban 启动 |
 | 8 | 生成 `.env` |
 | 9 | 加每日 3 点备份的 cron |
@@ -167,7 +167,7 @@ DOMAIN=relay.example.com ACME_EMAIL=你的邮箱@example.com bash bootstrap.sh
 ## 5. 启动服务
 
 ```bash
-cd /opt/dsh-remote
+cd /opt/dsh-console
 
 # 检查 .env
 cat .env
@@ -324,8 +324,8 @@ ss -tlnp | grep -E ':(22|80|443|8787)'   # 8787 只应监听容器内网，不�
 手动跑一次：
 
 ```bash
-bash /opt/dsh-remote/backup.sh
-ls -lh /opt/dsh-remote/backups/
+bash /opt/dsh-console/backup.sh
+ls -lh /opt/dsh-console/backups/
 ```
 
 看日志：
@@ -342,7 +342,7 @@ tail -f /var/log/dsh-backup.log
 
 | 目的 | 命令 |
 |---|---|
-| 看容器状态 | `cd /opt/dsh-remote && docker compose ps` |
+| 看容器状态 | `cd /opt/dsh-console && docker compose ps` |
 | 看日志 | `docker compose logs -f relay` |
 | 重启 | `docker compose restart` |
 | 更新代码后重建 | `docker compose up -d --build` |
@@ -364,7 +364,7 @@ tail -f /var/log/dsh-backup.log
 | WSS 连不上 | 路径错 / 反代没转 upgrade | 确认路径 `/ws`；Caddy 默认支持 WS，不用额外配置 |
 | 手机连不上、电脑能连 | 运营商到香港线路问题 | 换网络（4G/5G 对比）测；考虑上 Cloudflare 代理 |
 | 内存不够 / OOM | 2G 内存跑太多东西 | 已开 2G swap；`free -h` 看；关掉不用的容器 |
-| 磁盘满 | 日志/备份堆积 | 已配日志轮转 + 备份 7 天；`du -sh /opt/dsh-remote/*` |
+| 磁盘满 | 日志/备份堆积 | 已配日志轮转 + 备份 7 天；`du -sh /opt/dsh-console/*` |
 | SSH 被锁 | 改了端口/禁了密码 | 阿里云控制台 → Workbench（VNC）进去改回来 |
 
 ---

@@ -10,7 +10,7 @@ const BASE = process.env.PHONE_SERVER || S.server
 const HANDLE = process.env.PHONE_HANDLE || S.handle
 const PASSWORD = process.env.PHONE_PASSWORD || S.password
 const TOKEN_FILE = new URL('./.phone-token', import.meta.url)
-const OUT = process.env.SCREEN_OUT || join(tmpdir(), 'dsh-remote-screen.jpg')
+const OUT = process.env.SCREEN_OUT || join(tmpdir(), 'dsh-console-screen.jpg')
 
 async function login() {
   const res = await fetch(BASE + '/api/login', {

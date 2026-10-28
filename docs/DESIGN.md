@@ -1,4 +1,4 @@
-# DSH 手机远程控制插件 · 设计方案 v0.2
+# DSH Console · 设计方案 v0.2
 
 > 目标：人在外面，用手机给家里的电脑发一句话 / 一张图 / 一个文件，电脑上的 DSH 干活，结果实时回到手机。
 > 参考产品：联想「超级文件」的多设备登录与设备区分；DeepSeek App 的会话界面。
@@ -600,7 +600,7 @@ services:
 ### 10.2 E2E 细节（Phase 3）
 
 1. 配对时双方交换 **X25519 长期公钥**（私钥永不出设备）。
-2. 会话密钥：`ECDH(privA, pubB)` → `HKDF-SHA256(salt = pairingId, info = "dsh-remote-v1")` → 32 字节。
+2. 会话密钥：`ECDH(privA, pubB)` → `HKDF-SHA256(salt = pairingId, info = "dsh-console-v1")` → 32 字节。
 3. 每条消息：随机 96-bit nonce + `AES-256-GCM`，AAD 带上 `from/to/seq` 防重放。
 4. Blob：每文件随机 key 加密，key 用会话密钥包一层放在 `blob.begin` 里。
 

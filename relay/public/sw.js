@@ -1,5 +1,5 @@
 // 极简 Service Worker：静态资源走缓存，接口与 WebSocket 一律直连
-const CACHE = 'dsh-remote-v1'
+const CACHE = 'dsh-console-v1'
 const ASSETS = ['/', '/index.html', '/style.css', '/app.js', '/icon.svg', '/manifest.webmanifest']
 
 self.addEventListener('install', (event) => {

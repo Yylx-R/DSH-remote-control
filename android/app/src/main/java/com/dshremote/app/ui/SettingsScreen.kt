@@ -117,7 +117,7 @@ fun SettingsScreen(vm: AppViewModel, st: UiState) {
                         }
                     }
                 }
-                InfoRow("协议", "DSH 远程 v0.2")
+                InfoRow("协议", "DSH Console v0.2")
                 Text(
                     "手机通过你自己的中继服务器连接家里的电脑。会话、消息和文件都只经过这台服务器，不会上传到第三方。",
                     modifier = Modifier.padding(14.dp),

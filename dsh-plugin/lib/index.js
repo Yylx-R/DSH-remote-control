@@ -1,4 +1,4 @@
-// dsh-remote-control 插件入口
+// dsh-console 插件入口
 // 把本机 DSH 的会话/工作区能力通过自建中继服务器暴露给已配对的手机。
 import { statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -7,7 +7,7 @@ import { loadConfig } from './config.js'
 import { createRelayClient } from './relay-client.js'
 import { registerSetup } from './setup.js'
 
-export const name = 'dsh-remote-control'
+export const name = 'dsh-console'
 
 const COMMANDS_URL = new URL('./commands.js', import.meta.url)
 const COMMANDS_PATH = fileURLToPath(COMMANDS_URL)

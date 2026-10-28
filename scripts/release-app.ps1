@@ -46,7 +46,7 @@ try {
 
 $srcApk = "$proj\app\build\outputs\apk\debug\app-debug.apk"
 if (-not (Test-Path $srcApk)) { throw "没找到编译产物：$srcApk" }
-$apkName = "dsh-remote-app-$versionName.apk"
+$apkName = "dsh-console-app-$versionName.apk"
 $apk = "$root\$apkName"
 Copy-Item $srcApk $apk -Force
 
@@ -65,9 +65,12 @@ New-Item -ItemType Directory -Force $manifestDir | Out-Null
 [System.IO.File]::WriteAllText("$manifestDir\latest.json", $json, (New-Object System.Text.UTF8Encoding($false)))
 
 # ---- 4. 上传 ----
-scp -o StrictHostKeyChecking=no -i $SshKey $apk "root@${Server}:/opt/dsh-remote/relay/public/" | Out-Null
-scp -o StrictHostKeyChecking=no -i $SshKey "$manifestDir\latest.json" "root@${Server}:/opt/dsh-remote/relay/public/app/" | Out-Null
-ssh -o StrictHostKeyChecking=no -i $SshKey "root@$Server" "docker cp /opt/dsh-remote/relay/public/$apkName dsh-remote-relay-1:/app/public/ ; docker exec dsh-remote-relay-1 mkdir -p /app/public/app ; docker cp /opt/dsh-remote/relay/public/app/latest.json dsh-remote-relay-1:/app/public/app/latest.json ; echo PUBLISHED"
+# 服务器目录与容器名可用环境变量覆盖（历史部署叫 dsh-remote，新部署叫 dsh-console）
+$remoteDir = if ($env:RELAY_DIR) { $env:RELAY_DIR } else { '/opt/dsh-remote' }
+$container = if ($env:RELAY_CONTAINER) { $env:RELAY_CONTAINER } else { 'dsh-remote-relay-1' }
+scp -o StrictHostKeyChecking=no -i $SshKey $apk "root@${Server}:$remoteDir/relay/public/" | Out-Null
+scp -o StrictHostKeyChecking=no -i $SshKey "$manifestDir\latest.json" "root@${Server}:$remoteDir/relay/public/app/" | Out-Null
+ssh -o StrictHostKeyChecking=no -i $SshKey "root@$Server" "docker cp $remoteDir/relay/public/$apkName ${container}:/app/public/ ; docker exec $container mkdir -p /app/public/app ; docker cp $remoteDir/relay/public/app/latest.json ${container}:/app/public/app/latest.json ; echo PUBLISHED"
 
 Write-Host "完成：http://$Server/$apkName"
 Write-Host "手机上打开 App → 设置 → 应用更新 → 检查更新，即可安装。"

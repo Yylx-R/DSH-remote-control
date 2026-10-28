@@ -1,8 +1,8 @@
-name: ${COMPOSE_PROJECT_NAME:-dsh-remote}
+name: ${COMPOSE_PROJECT_NAME:-dsh-console}
 
 # 两种用法：
 #   源码部署：docker compose up -d --build
-#   镜像部署：在 .env 里设 RELAY_IMAGE=ghcr.io/<owner>/dsh-remote-relay:latest
+#   镜像部署：在 .env 里设 RELAY_IMAGE=ghcr.io/<owner>/dsh-console-relay:latest
 #            docker compose pull && docker compose up -d
 #
 # 有域名（自动 HTTPS）：docker compose --profile tls up -d --build
@@ -10,7 +10,7 @@ name: ${COMPOSE_PROJECT_NAME:-dsh-remote}
 
 services:
   relay:
-    image: ${RELAY_IMAGE:-dsh-remote-relay:local}
+    image: ${RELAY_IMAGE:-dsh-console-relay:local}
     build:
       context: ../relay
       dockerfile: Dockerfile

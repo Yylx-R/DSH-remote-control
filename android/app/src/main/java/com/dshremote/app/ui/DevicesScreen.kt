@@ -56,7 +56,7 @@ fun DevicesScreen(vm: AppViewModel, st: UiState) {
 
     Column(Modifier.fillMaxSize()) {
         DshTopBar(
-            title = "DSH 远程",
+            title = "DSH Console",
             subtitle = st.handle.ifBlank { "未登录" } + " · " + if (st.connected) "已连接" else "未连接",
             actions = {
                 IconButton(onClick = vm::refreshDevices) {
@@ -107,7 +107,7 @@ fun DevicesScreen(vm: AppViewModel, st: UiState) {
                 item {
                     EmptyHint(
                         "还没有配对的电脑",
-                        "在电脑上打开 DSH 远程插件生成 8 位配对码，\n然后在这里输入配对码完成配对。",
+                        "在电脑上打开 DSH Console插件生成 8 位配对码，\n然后在这里输入配对码完成配对。",
                     )
                 }
             }

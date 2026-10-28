@@ -66,7 +66,7 @@ fun LoginScreen(vm: AppViewModel, st: UiState) {
 
         Spacer(Modifier.height(22.dp))
         Text(
-            "DSH 远程",
+            "DSH Console",
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 26.sp),
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -128,7 +128,7 @@ fun LoginScreen(vm: AppViewModel, st: UiState) {
 
         Spacer(Modifier.height(18.dp))
         Text(
-            "首次使用请先在电脑上部署 DSH 远程插件并生成配对码；\n注册新账号需要管理员提供的邀请码。",
+            "首次使用请先在电脑上部署 DSH Console插件并生成配对码；\n注册新账号需要管理员提供的邀请码。",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
             lineHeight = 18.sp,

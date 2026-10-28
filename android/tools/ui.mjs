@@ -1,4 +1,4 @@
-// Tiny adb UI driver for driving the DSH Remote app inside the emulator.
+// Tiny adb UI driver for driving the DSH Console app inside the emulator.
 // Usage:
 //   node tools/ui.mjs dump                 → list nodes (text / content-desc / bounds / clickable)
 //   node tools/ui.mjs tap "登录"            → tap first node whose text or desc matches (substring, case-insensitive)

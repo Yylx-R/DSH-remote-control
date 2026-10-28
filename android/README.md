@@ -1,4 +1,4 @@
-# DSH Remote · Android 客户端
+# DSH Console · Android 客户端
 
 原生 Kotlin + Jetpack Compose 写的手机端（不套 WebView）：登录你自建的中继服务器 → 选择已配对的电脑 →
 浏览会话、发消息、上传附件、查看电脑屏幕、远程按键。协议与网页版（`relay/public`）完全一致。

@@ -9,7 +9,7 @@ const PAGE = `<!doctype html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DSH 远程控制 · 电脑端配置</title>
+<title>DSH Console · 电脑端配置</title>
 <style>
   :root { color-scheme: light dark; }
   * { box-sizing: border-box; }
@@ -43,7 +43,7 @@ const PAGE = `<!doctype html>
 </head>
 <body>
 <div class="wrap">
-  <h1>DSH 远程控制 · 电脑端</h1>
+  <h1>DSH Console · 电脑端</h1>
   <p class="sub">填写你自己的中转服务器地址和账号。保存后立即生效，不需要重启 DSH。</p>
   <div class="card">
     <label for="serverUrl">服务器地址</label>

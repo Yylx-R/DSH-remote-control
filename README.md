@@ -1,8 +1,8 @@
-# DSH Remote · 手机远程操作你的 DSH
+# DSH Console · 手机远程操作你的 DSH
 
-[![CI](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/ci.yml/badge.svg)](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/ci.yml)
-[![Docker](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/docker.yml/badge.svg)](https://github.com/Yylx-R/DSH-remote-control/actions/workflows/docker.yml)
-[![Release](https://img.shields.io/github/v/release/Yylx-R/DSH-remote-control)](https://github.com/Yylx-R/DSH-remote-control/releases)
+[![CI](https://github.com/Yylx-R/dsh-console/actions/workflows/ci.yml/badge.svg)](https://github.com/Yylx-R/dsh-console/actions/workflows/ci.yml)
+[![Docker](https://github.com/Yylx-R/dsh-console/actions/workflows/docker.yml/badge.svg)](https://github.com/Yylx-R/dsh-console/actions/workflows/docker.yml)
+[![Release](https://img.shields.io/github/v/release/Yylx-R/dsh-console)](https://github.com/Yylx-R/dsh-console/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](android/)
 
@@ -55,8 +55,8 @@ docs/         设计方案（架构、协议、数据模型、路线图）
 **你不需要自己的服务器**——这套东西是自托管的：谁想用，就部署到自己的机器上。一台 2 核 2G 的小机器足够（5~10 人、10~25 台设备），甚至树莓派/NAS 也行。
 
 ```bash
-git clone https://github.com/Yylx-R/DSH-remote-control.git dsh-remote
-cd dsh-remote
+git clone https://github.com/Yylx-R/dsh-console.git dsh-console
+cd dsh-console
 
 # 有域名（自动申请证书、开 HTTPS）
 sudo bash deploy/install.sh --domain relay.example.com --email you@example.com
@@ -77,7 +77,7 @@ sudo bash deploy/uninstall.sh --purge   # 连数据库、上传文件、证书�
 也可以用预构建镜像，省掉本地构建（镜像默认私有，需先 `docker login ghcr.io`；不登录就用默认的本地构建）：
 
 ```bash
-sudo bash deploy/install.sh --image ghcr.io/yylx-r/dsh-remote-relay:latest --domain relay.example.com --email you@example.com
+sudo bash deploy/install.sh --image ghcr.io/yylx-r/dsh-console-relay:latest --domain relay.example.com --email you@example.com
 ```
 
 升级 = `docker compose pull && docker compose up -d`；数据全在 `deploy/data/`，备份 `bash deploy/backup.sh`。

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# DSH Remote 一键部署（Ubuntu / Debian / 通用 Linux）
+# DSH Console 一键部署（Ubuntu / Debian / 通用 Linux）
 #
 # 用法：
 #   sudo bash deploy/install.sh --domain relay.example.com --email you@example.com
-#   sudo bash deploy/install.sh --dir /opt/dsh-remote --image ghcr.io/you/dsh-remote-relay:latest
+#   sudo bash deploy/install.sh --dir /opt/dsh-console --image ghcr.io/you/dsh-console-relay:latest
 #   sudo bash deploy/install.sh            # 无域名，HTTP 直连（80 端口）
 #
 # 脚本做的事：装 Docker（若缺）→ 写 .env → 起 relay（+ Caddy 自动 HTTPS）→ 健康检查 → 打印访问地址。
@@ -65,7 +65,7 @@ cd "$DIR/deploy"
 mkdir -p data
 
 # 防撞车：同名 compose 项目会互相顶掉容器（数据卷也跟着换目录）
-PROJECT="${COMPOSE_PROJECT_NAME:-dsh-remote}"
+PROJECT="${COMPOSE_PROJECT_NAME:-dsh-console}"
 if docker compose ls -a --format json 2>/dev/null | grep -q "\"Name\":\"${PROJECT}\""; then
   if ! docker compose ls -a --format json 2>/dev/null | grep -q "${PWD}"; then
     die "已存在同名项目 ${PROJECT}（来自其他目录）。请先 'cd <那个目录> && docker compose down'，或用 COMPOSE_PROJECT_NAME=xxx 换一个项目名"

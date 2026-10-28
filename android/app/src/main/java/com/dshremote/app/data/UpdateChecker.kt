@@ -19,7 +19,7 @@ data class AppUpdate(
  * 检查更新：从自己的中转服务器读 /app/latest.json，和本机 versionCode 比较。
  * 服务器上的目录结构：
  *   public/app/latest.json
- *   public/dsh-remote-app-<version>.apk
+ *   public/dsh-console-app-<version>.apk
  */
 object UpdateChecker {
 
@@ -57,7 +57,7 @@ object UpdateChecker {
     /** 下载 APK 到 cacheDir/update/，返回本地文件。 */
     fun download(update: AppUpdate, targetDir: java.io.File): java.io.File {
         targetDir.mkdirs()
-        val out = java.io.File(targetDir, "dsh-remote-${update.versionCode}.apk")
+        val out = java.io.File(targetDir, "dsh-console-${update.versionCode}.apk")
         if (out.exists() && out.length() == update.size && update.size > 0) {
             if (update.sha256.isEmpty() || sha256(out) == update.sha256) return out
             out.delete() // 缓存文件与服务器发布的不一致，重新下载

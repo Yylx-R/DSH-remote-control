@@ -2,7 +2,7 @@
 # 每日备份：SQLite 热备 + 数据目录打包，保留 7 天
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-/opt/dsh-remote}"
+APP_DIR="${APP_DIR:-/opt/dsh-console}"
 BK_DIR="$APP_DIR/backups"
 mkdir -p "$BK_DIR"
 STAMP="$(date +%F-%H%M)"
