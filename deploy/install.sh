@@ -73,14 +73,24 @@ if docker compose ls -a --format json 2>/dev/null | grep -q "\"Name\":\"${PROJEC
 fi
 export COMPOSE_PROJECT_NAME="$PROJECT"
 
+DIRECT_MODE=0
+[[ -n "$DOMAIN" && "$NO_TLS" -eq 0 ]] || DIRECT_MODE=1
+
 if [[ -f .env ]]; then
   ok "沿用已有 .env"
+  # 老部署升级上来时补上 COMPOSE_FILE，否则之后手动 `docker compose up -d`
+  # 只会用 docker-compose.yml，80 端口映射会丢，站点直接不可访问
+  if [[ "$DIRECT_MODE" -eq 1 ]] && ! grep -q '^COMPOSE_FILE=' .env; then
+    echo 'COMPOSE_FILE=docker-compose.yml:docker-compose.direct.yml' >> .env
+    ok "已补写 COMPOSE_FILE（HTTP 直连模式）"
+  fi
 else
   {
     echo "# 由 install.sh 生成于 $(date '+%F %T')"
     echo "DOMAIN=${DOMAIN}"
     echo "ACME_EMAIL=${EMAIL}"
     [[ -n "$IMAGE" ]] && echo "RELAY_IMAGE=${IMAGE}"
+    [[ "$DIRECT_MODE" -eq 1 ]] && echo 'COMPOSE_FILE=docker-compose.yml:docker-compose.direct.yml'
     echo "BLOB_MAX_MB=50"
   } > .env
   ok "写入 .env"

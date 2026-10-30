@@ -237,6 +237,10 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
                 }
             },
             onFile = { panel = false; files.launch(arrayOf("*/*")) },
+            onOpenFiles = {
+                panel = false
+                vm.openFiles()
+            },
         )
     }
 }
@@ -420,6 +424,7 @@ private fun InputBar(
     onGallery: () -> Unit,
     onCamera: () -> Unit,
     onFile: () -> Unit,
+    onOpenFiles: () -> Unit,
 ) {
     val canSend = text.isNotBlank() || st.staged.isNotEmpty()
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -528,6 +533,7 @@ private fun InputBar(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         QuickChip("刷新会话") { onRefresh() }
+                        QuickChip("交付物") { onOpenFiles() }
                         if (st.streaming) QuickChip("停止任务", danger = true) { onStop() }
                     }
                 }

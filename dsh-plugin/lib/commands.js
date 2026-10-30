@@ -1,10 +1,12 @@
 // 指令路由：把手机发来的 {op, rid, ...} 翻译成 DSH 的 host 服务调用
 import { randomUUID } from 'node:crypto'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile, readFile, stat } from 'node:fs/promises'
 import { join, basename, extname } from 'node:path'
+import { listFiles, resolveInside, guessMime } from './files.js'
 
 const MAX_TEXT = 200_000
 const MAX_ATTACHMENT_BYTES = 50 * 1024 * 1024
+const MAX_DELIVER_BYTES = 25 * 1024 * 1024
 
 function blockText(content) {
   if (!Array.isArray(content)) return ''
@@ -155,6 +157,17 @@ export function createCommandRouter({ ctx, log, client, cfg, follows = new Map()
       log.info(`已接收手机附件：${finalName}（${buf.length} 字节）→ ${path}`)
     }
     return saved
+  }
+
+  // 会话目录：手机请求文件时用它作为根目录
+  async function sessionCwd(body) {
+    if (typeof body?.cwd === 'string' && body.cwd) return body.cwd
+    const sessionId = String(body?.sessionId || '')
+    if (!sessionId) throw Object.assign(new Error('sessionId 缺失'), { code: 'bad/request' })
+    const list = await sc().list({}, AbortSignal.timeout(10_000))
+    const item = (Array.isArray(list?.items) ? list.items : []).find((s) => s.sessionId === sessionId)
+    if (item?.cwd) return item.cwd
+    throw Object.assign(new Error('无法确定会话目录'), { code: 'files/no-cwd' })
   }
 
   async function snapshotOnce(params) {
@@ -374,6 +387,39 @@ export function createCommandRouter({ ctx, log, client, cfg, follows = new Map()
           const action = String(body.action || 'alt_tab')
           const res = await mod.controlScreen(action)
           return reply(res)
+        }
+
+        case 'files.list': {
+          const cwd = await sessionCwd(body)
+          const max = Math.min(500, Math.max(20, Number(body.max) || 200))
+          const items = await listFiles(cwd, { max })
+          return reply({ cwd, items })
+        }
+
+        case 'files.send': {
+          const cwd = await sessionCwd(body)
+          const abs = resolveInside(cwd, body.path)
+          const st = await stat(abs).catch(() => null)
+          if (!st || !st.isFile()) throw Object.assign(new Error('文件不存在'), { code: 'files/not-found' })
+          if (st.size > MAX_DELIVER_BYTES) {
+            throw Object.assign(new Error('文件超过 25MB'), { code: 'files/too-large' })
+          }
+          const buf = await readFile(abs)
+          const name = basename(abs)
+          const mime = guessMime(name)
+          const res = await fetch(relayBase() + '/api/blob', {
+            method: 'POST',
+            headers: {
+              authorization: `Bearer ${cfg.token}`,
+              'content-type': mime,
+              'x-name': encodeURIComponent(name),
+            },
+            body: buf,
+          })
+          const data = await res.json().catch(() => ({}))
+          if (!res.ok) throw Object.assign(new Error(data.error || `上传失败 ${res.status}`), { code: 'files/upload' })
+          log.info(`已下发文件：${name}（${buf.length} 字节）blob=${data.blobId}`)
+          return reply({ blobId: data.blobId, name, size: buf.length, mime, path: String(body.path || '') })
         }
 
         case 'pair.code': {

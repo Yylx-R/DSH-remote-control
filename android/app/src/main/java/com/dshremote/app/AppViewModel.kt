@@ -1,6 +1,7 @@
 package com.dshremote.app
 
 import android.app.Application
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import java.io.File
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonArray
 
@@ -93,6 +95,20 @@ data class UiState(
     val updateChecking: Boolean = false,
     val updateDownloading: Boolean = false,
     val updateStatus: String = "",
+    // 交付物：电脑会话目录里的文件
+    val filesOpen: Boolean = false,
+    val filesLoading: Boolean = false,
+    val filesCwd: String = "",
+    val files: List<RemoteFile> = emptyList(),
+    val filesBusy: String? = null,
+)
+
+/** 电脑上可下发的文件 */
+data class RemoteFile(
+    val path: String,
+    val name: String,
+    val size: Long,
+    val mtime: Long,
 )
 
 class AppViewModel(app: Application) : AndroidViewModel(app) {
@@ -657,6 +673,75 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     fun cycleShotZoom() = _state.update { it.copy(shotZoom = if (it.shotZoom >= 3) 1 else it.shotZoom + 1) }
     fun toggleShotAuto() = _state.update { it.copy(shotAuto = !it.shotAuto) }
     fun toggleShotFullscreen() = _state.update { it.copy(shotFullscreen = !it.shotFullscreen) }
+
+    // ── 交付物：浏览并取回电脑会话目录里的文件 ──
+
+    fun openFiles() {
+        _state.update { it.copy(filesOpen = true) }
+        refreshFiles()
+    }
+
+    fun closeFiles() = _state.update { it.copy(filesOpen = false, filesBusy = null) }
+
+    fun refreshFiles() {
+        val st = _state.value
+        val session = st.currentSession ?: return
+        if (st.filesLoading) return
+        viewModelScope.launch {
+            _state.update { it.copy(filesLoading = true) }
+            try {
+                val res = ask("files.list", buildJson("sessionId" to session.sessionId), 30_000)
+                val list = (res["items"] as? JsonArray)?.mapNotNull { el ->
+                    val o = el as? JsonObject ?: return@mapNotNull null
+                    RemoteFile(
+                        path = o.str("path") ?: return@mapNotNull null,
+                        name = o.str("name") ?: "",
+                        size = o.long("size") ?: 0L,
+                        mtime = o.long("mtime") ?: 0L,
+                    )
+                } ?: emptyList()
+                _state.update { it.copy(files = list, filesLoading = false, filesCwd = res.str("cwd") ?: "") }
+            } catch (e: Exception) {
+                _state.update { it.copy(filesLoading = false, toast = e.message) }
+            }
+        }
+    }
+
+    fun downloadFile(f: RemoteFile) {
+        val st = _state.value
+        val session = st.currentSession ?: return
+        if (st.filesBusy != null) return
+        viewModelScope.launch {
+            _state.update { it.copy(filesBusy = f.path) }
+            try {
+                val token = st.token ?: throw ApiException("未登录")
+                val res = ask("files.send", buildJson("sessionId" to session.sessionId, "path" to f.path), 180_000)
+                val blobId = res.str("blobId") ?: throw ApiException("取回失败")
+                val bytes = api.downloadBlob(st.serverUrl, token, blobId)
+                val dir = File(getApplication<Application>().filesDir, "deliveries").apply { mkdirs() }
+                val out = File(dir, f.name)
+                out.writeBytes(bytes)
+                _state.update { it.copy(filesBusy = null, toast = "已保存 ${f.name}（${bytes.size / 1024}KB）") }
+                openLocalFile(out, res.str("mime") ?: "application/octet-stream")
+            } catch (e: Exception) {
+                _state.update { it.copy(filesBusy = null, toast = e.message) }
+            }
+        }
+    }
+
+    private fun openLocalFile(file: File, mime: String) {
+        runCatching {
+            val ctx = getApplication<Application>()
+            val uri = androidx.core.content.FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mime)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            ctx.startActivity(intent)
+        }.onFailure { e ->
+            _state.update { it.copy(toast = "已保存到 ${file.parent}，但没有应用能打开：${e.message}") }
+        }
+    }
 
     /** 外观：system / light / dark */
     fun setThemeMode(v: String) {

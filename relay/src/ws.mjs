@@ -126,6 +126,24 @@ export function createHub({ db, cfg }) {
       return
     }
     const blobs = Array.isArray(frame.blobs) ? frame.blobs.slice(0, 20).map(String) : []
+    const op = String(frame.body?.op || '')
+
+    // 流式帧与指令回包是「一次性」的：目标离线时直接丢弃，不进离线队列
+    // （否则一次长任务会把几百条 stream 帧写进库，撑爆存储也没意义）
+    if (kind === 'dsh' && (op === 'stream' || op === 'reply')) {
+      const ok = send(to, {
+        t: 'msg',
+        id,
+        from: device.id,
+        kind,
+        body: frame.body ?? {},
+        blobs,
+        createdAt: now(),
+      })
+      if (!ok) console.log(`[relay] drop ${op} ${device.id} -> ${to}（目标离线）`)
+      return
+    }
+
     const seq = nextSeq(db, device.user_id, 'msg')
     const createdAt = now()
     db.prepare(

@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,6 +24,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dshremote.app.ui.ChatScreen
 import com.dshremote.app.ui.DevicesScreen
+import com.dshremote.app.ui.FilesSheet
 import com.dshremote.app.ui.LoginScreen
 import com.dshremote.app.ui.ScreenViewScreen
 import com.dshremote.app.ui.SessionsScreen
@@ -75,13 +77,16 @@ private fun AppRoot(vm: AppViewModel = viewModel()) {
                 vm.back()
             }
 
-            when (st.screen) {
-                Screen.Login -> LoginScreen(vm, st)
-                Screen.Devices -> DevicesScreen(vm, st)
-                Screen.Sessions -> SessionsScreen(vm, st)
-                Screen.Chat -> ChatScreen(vm, st)
-                Screen.Settings -> SettingsScreen(vm, st)
-                Screen.ScreenView -> ScreenViewScreen(vm, st)
+            Box(Modifier.fillMaxSize()) {
+                when (st.screen) {
+                    Screen.Login -> LoginScreen(vm, st)
+                    Screen.Devices -> DevicesScreen(vm, st)
+                    Screen.Sessions -> SessionsScreen(vm, st)
+                    Screen.Chat -> ChatScreen(vm, st)
+                    Screen.Settings -> SettingsScreen(vm, st)
+                    Screen.ScreenView -> ScreenViewScreen(vm, st)
+                }
+                FilesSheet(vm, st)
             }
         }
     }
