@@ -2,6 +2,7 @@ package com.dshremote.app.ui
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -13,8 +14,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,9 +80,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -98,6 +103,13 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
     var panel by remember { mutableStateOf(false) }
     var cameraOpen by remember { mutableStateOf(false) }
     val ctx = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+    val copyText: (String) -> Unit = { s ->
+        if (s.isNotBlank()) {
+            clipboard.setText(AnnotatedString(s))
+            Toast.makeText(ctx, "已复制", Toast.LENGTH_SHORT).show()
+        }
+    }
     val keyboard = LocalSoftwareKeyboardController.current
     val focus = LocalFocusManager.current
     val last = st.messages.lastOrNull()
@@ -188,7 +200,7 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
                     }
                 }
                 itemsIndexed(st.messages) { index, m ->
-                    MessageRow(m, streaming = st.streaming && index == st.messages.lastIndex)
+                    MessageRow(m, streaming = st.streaming && index == st.messages.lastIndex, onCopy = copyText)
                 }
             }
         }
@@ -306,8 +318,14 @@ private fun StagedRow(staged: List<StagedAttachment>, onRemove: (String) -> Unit
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MessageRow(m: ChatMessage, streaming: Boolean) {
+private fun MessageRow(m: ChatMessage, streaming: Boolean, onCopy: (String) -> Unit) {
+    // 长按气泡：整条复制（文字区域内的长按仍由 SelectionContainer 负责选择）
+    val longPressCopy = Modifier.combinedClickable(
+        onClick = {},
+        onLongClick = { onCopy(m.text) },
+    )
     when (m.role) {
         "user" -> Row(
             modifier = Modifier.fillMaxWidth(),
@@ -316,7 +334,7 @@ private fun MessageRow(m: ChatMessage, streaming: Boolean) {
             Surface(
                 color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 4.dp),
-                modifier = Modifier.widthIn160(),
+                modifier = Modifier.widthIn160().then(longPressCopy),
             ) {
                 Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
                     if (m.attachNames.isNotEmpty()) {
@@ -354,22 +372,24 @@ private fun MessageRow(m: ChatMessage, streaming: Boolean) {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
-                modifier = Modifier.widthIn160(),
+                modifier = Modifier.widthIn160().then(longPressCopy),
             ) {
                 Row(
                     Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     val scheme = MaterialTheme.colorScheme
-                    Text(
-                        if (m.text.isEmpty()) AnnotatedStringOf("…") else markdownAnnotated(
-                            m.text,
-                            scheme.onSurface,
-                            scheme.onSurfaceVariant,
-                            scheme.surfaceVariant,
-                        ),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                    SelectionContainer {
+                        Text(
+                            if (m.text.isEmpty()) AnnotatedStringOf("…") else markdownAnnotated(
+                                m.text,
+                                scheme.onSurface,
+                                scheme.onSurfaceVariant,
+                                scheme.surfaceVariant,
+                            ),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                     if (streaming || m.streaming) Cursor()
                 }
             }
@@ -379,6 +399,7 @@ private fun MessageRow(m: ChatMessage, streaming: Boolean) {
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                 shape = RoundedCornerShape(8.dp),
+                modifier = longPressCopy,
             ) {
                 Text(
                     "🛠 调用工具 「${m.name.orEmpty().ifBlank { "tool" }}」",
