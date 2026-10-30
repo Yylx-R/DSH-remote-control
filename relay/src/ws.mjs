@@ -128,9 +128,10 @@ export function createHub({ db, cfg }) {
     const blobs = Array.isArray(frame.blobs) ? frame.blobs.slice(0, 20).map(String) : []
     const op = String(frame.body?.op || '')
 
-    // 流式帧与指令回包是「一次性」的：目标离线时直接丢弃，不进离线队列
-    // （否则一次长任务会把几百条 stream 帧写进库，撑爆存储也没意义）
-    if (kind === 'dsh' && (op === 'stream' || op === 'reply')) {
+    // 流式帧（op=stream）是纯增量：目标离线就丢弃，不然一次长任务几百帧会把库撑爆。
+    // 但指令回包（op=reply）不能丢——手机端在等它 resolve，丢了就永远「发送中」，
+    // 表现就是「手机收不到回复」。回包进离线队列，TTL 短一些即可。
+    if (kind === 'dsh' && op === 'stream') {
       const ok = send(to, {
         t: 'msg',
         id,
@@ -140,16 +141,17 @@ export function createHub({ db, cfg }) {
         blobs,
         createdAt: now(),
       })
-      if (!ok) console.log(`[relay] drop ${op} ${device.id} -> ${to}（目标离线）`)
+      if (!ok) console.log(`[relay] drop stream ${device.id} -> ${to}（目标离线）`)
       return
     }
 
+    const ttl = kind === 'dsh' && op === 'reply' ? 10 * 60_000 : 7 * 86400_000
     const seq = nextSeq(db, device.user_id, 'msg')
     const createdAt = now()
     db.prepare(
       `INSERT INTO messages(id, user_id, seq, from_device, to_device, kind, body, blobs, delivered, created_at, expires_at)
        VALUES (?,?,?,?,?,?,?,?,0,?,?)`,
-    ).run(id, device.user_id, seq, device.id, to, kind, bodyText, JSON.stringify(blobs), createdAt, createdAt + 7 * 86400_000)
+    ).run(id, device.user_id, seq, device.id, to, kind, bodyText, JSON.stringify(blobs), createdAt, createdAt + ttl)
 
     const ok = send(to, {
       t: 'msg',
@@ -200,6 +202,8 @@ export function createHub({ db, cfg }) {
       }, 10000)
 
       ws.on('message', (data) => {
+        // 任何入站帧都算「活着」：手机端每 25s 发应用层 ping，弱网下比控制帧可靠
+        ws.alive = true
         let frame
         try {
           frame = JSON.parse(data.toString())
@@ -239,9 +243,9 @@ export function createHub({ db, cfg }) {
     const timer = setInterval(() => {
       for (const [id, c] of conns) {
         if (!c.alive) {
-          // 容忍一次丢包：连续两个周期都没反应才断开，避免弱网下频繁闪断
+          // 容忍两次丢包：连续三个周期（约 90s）都没反应才断开，弱网/后台冻结时不至于频繁闪断
           c.miss = (c.miss || 0) + 1
-          if (c.miss < 2) {
+          if (c.miss < 3) {
             try {
               c.ws.ping()
             } catch {}
