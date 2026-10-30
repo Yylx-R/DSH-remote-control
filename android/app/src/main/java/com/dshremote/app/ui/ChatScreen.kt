@@ -96,7 +96,7 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
     val listState = rememberLazyListState()
     var input by rememberSaveable { mutableStateOf("") }
     var panel by remember { mutableStateOf(false) }
-    var camUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraOpen by remember { mutableStateOf(false) }
     val ctx = LocalContext.current
     val keyboard = LocalSoftwareKeyboardController.current
     val focus = LocalFocusManager.current
@@ -108,11 +108,6 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
     }
     val files = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { u ->
         u?.let { vm.addAttachment(it) }
-    }
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
-        val u = camUri
-        camUri = null
-        if (ok && u != null) vm.addAttachment(u)
     }
 
     // 新消息 / 流式增长：跟着最新一条走
@@ -131,13 +126,14 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(
-                WindowInsets.navigationBars.union(WindowInsets.ime).only(WindowInsetsSides.Bottom),
-            ),
-    ) {
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(
+                    WindowInsets.navigationBars.union(WindowInsets.ime).only(WindowInsetsSides.Bottom),
+                ),
+        ) {
         DshTopBar(
             title = st.currentSession?.title?.ifBlank { "会话" } ?: "会话",
             subtitle = st.currentSession?.cwd,
@@ -231,10 +227,7 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
             onGallery = { panel = false; gallery.launch("image/*") },
             onCamera = {
                 panel = false
-                runCatching { newCameraUri(ctx) }.getOrNull()?.let { u ->
-                    camUri = u
-                    camera.launch(u)
-                }
+                cameraOpen = true
             },
             onFile = { panel = false; files.launch(arrayOf("*/*")) },
             onOpenFiles = {
@@ -242,13 +235,18 @@ fun ChatScreen(vm: AppViewModel, st: UiState) {
                 vm.openFiles()
             },
         )
-    }
-}
+        }
 
-private fun newCameraUri(ctx: Context): Uri {
-    val dir = File(ctx.cacheDir, "camera").apply { mkdirs() }
-    val f = File(dir, "shot_${System.currentTimeMillis()}.jpg")
-    return FileProvider.getUriForFile(ctx, ctx.packageName + ".fileprovider", f)
+        if (cameraOpen) {
+            CameraCaptureOverlay(
+                onClose = { cameraOpen = false },
+                onCaptured = { uri ->
+                    cameraOpen = false
+                    vm.addAttachment(uri)
+                },
+            )
+        }
+    }
 }
 
 @Composable
